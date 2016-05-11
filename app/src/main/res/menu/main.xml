@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_connect"
+        android:orderInCategory="101"
+        android:title="@string/menu_connect_title"/>
+    <item
+        android:id="@+id/menu_disconnect"
+        android:orderInCategory="102"
+        android:title="@string/menu_disconnect_title"/>
+    <item
+        android:id="@+id/menu_server_start"
+        android:orderInCategory="103"
+        android:title="@string/menu_server_start_title"/>
+    <item
+        android:id="@+id/menu_server_stop"
+        android:orderInCategory="104"
+        android:title="@string/menu_server_stop_title"/>
+    <item
+        android:id="@+id/menu_about"
+        android:orderInCategory="105"
+        android:title="@string/menu_about_title"/>
+
+</menu>
