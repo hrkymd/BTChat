@@ -24,7 +24,8 @@
     <string name="bt_status_stopped">Select a device</string>
     <string name="bt_status_scanning">Scanning progress</string>
 
-    <string name="message_title">Message %d</string>
+    <string name="message_title">#%1$d (%2$s)</string>
+    <string name="message_content">%1$s\n\n%2$s</string>
 
     <string name="toast_bluetooth_not_supported">This device does not support Bluetooth</string>
     <string name="toast_bluetooth_disabled">Bluetooth should be enabled</string>

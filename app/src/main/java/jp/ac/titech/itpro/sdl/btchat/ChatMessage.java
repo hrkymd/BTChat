@@ -11,28 +11,21 @@ import java.io.Closeable;
 import java.io.IOException;
 
 public class ChatMessage implements Parcelable {
-    private final static String TAG = "ChagMessage";
-
-    public final static int KIND_UNKNOWN = 0;
-    public final static int KIND_MESSAGE = 1;
-    public final static int KIND_ACK = 2;
-    public final static int KIND_CLOSE = 3;
-
-    private final static String FIELD_KIND = "kind";
     private final static String FIELD_SEQ = "seq";
     private final static String FIELD_TIME = "time";
     private final static String FIELD_CONTENT = "content";
+    private final static String FIELD_SENDER = "sender";
 
-    public int kind;
     public int seq;
     public long time;
     public String content;
+    public String sender;
 
-    public ChatMessage(int kind, int seq, long time, String content) {
-        this.kind = kind;
+    public ChatMessage(int seq, long time, String content, String sender) {
         this.seq = seq;
         this.time = time;
         this.content = content;
+        this.sender = sender;
     }
 
     @Override
@@ -41,10 +34,10 @@ public class ChatMessage implements Parcelable {
     }
 
     private ChatMessage(Parcel in) {
-        kind = in.readInt();
         seq = in.readInt();
         time = in.readLong();
         content = in.readString();
+        sender = in.readString();
     }
 
     @Override
@@ -54,10 +47,10 @@ public class ChatMessage implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(kind);
         dest.writeInt(seq);
         dest.writeLong(time);
         dest.writeString(content);
+        dest.writeString(sender);
     }
 
     public static final Parcelable.Creator<ChatMessage> CREATOR =
@@ -103,16 +96,13 @@ public class ChatMessage implements Parcelable {
 
         public ChatMessage read() throws IOException {
             Log.d(TAG, "read");
-            int kind = KIND_UNKNOWN;
             int seq = -1;
             long time = -1;
             String content = null;
+            String sender = null;
             reader.beginObject();
             while (reader.hasNext()) {
                 switch (reader.nextName()) {
-                case FIELD_KIND:
-                    kind = reader.nextInt();
-                    break;
                 case FIELD_SEQ:
                     seq = reader.nextInt();
                     break;
@@ -127,13 +117,21 @@ public class ChatMessage implements Parcelable {
                     else
                         content = reader.nextString();
                     break;
+                case FIELD_SENDER:
+                    if (reader.peek() == JsonToken.NULL) {
+                        reader.skipValue();
+                        sender = null;
+                    }
+                    else
+                        sender = reader.nextString();
+                    break;
                 default:
                     reader.skipValue();
                     break;
                 }
             }
             reader.endObject();
-            return new ChatMessage(kind, seq, time, content);
+            return new ChatMessage(seq, time, content, sender);
         }
     }
 
@@ -171,7 +169,6 @@ public class ChatMessage implements Parcelable {
         public void write(ChatMessage message) throws IOException {
             Log.d(TAG, "write");
             writer.beginObject();
-            writer.name(FIELD_KIND).value(message.kind);
             writer.name(FIELD_SEQ).value(message.seq);
             writer.name(FIELD_TIME).value(message.time);
             writer.name(FIELD_CONTENT);
@@ -179,6 +176,11 @@ public class ChatMessage implements Parcelable {
                 writer.nullValue();
             else
                 writer.value(message.content);
+            writer.name(FIELD_SENDER);
+            if (message.sender == null)
+                writer.nullValue();
+            else
+                writer.value(message.sender);
             writer.endObject();
         }
     }

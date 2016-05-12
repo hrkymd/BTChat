@@ -263,8 +263,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ChatMessage message = (ChatMessage) parent.getItemAtPosition(position);
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(getString(R.string.message_title, message.seq))
-                        .setMessage(dateFormat.format(new Date(message.time)))
+                        .setTitle(getString(R.string.message_title, message.seq, message.sender))
+                        .setMessage(getString(R.string.message_content, message.content,
+                                dateFormat.format(new Date(message.time))))
                         .setPositiveButton(android.R.string.ok, null)
                         .show();
             }
@@ -308,8 +309,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onClickSendButton");
         if (commThread != null) {
             String content = inputText.getText().toString().trim();
+            String sender = btAdapter.getName();
             ChatMessage message =
-                    new ChatMessage(ChatMessage.KIND_MESSAGE, ++message_seq, System.currentTimeMillis(), content);
+                    new ChatMessage(++message_seq, System.currentTimeMillis(), content, sender);
             commThread.send(message);
             chatLogAdapter.add(message);
             chatLogAdapter.notifyDataSetChanged();
