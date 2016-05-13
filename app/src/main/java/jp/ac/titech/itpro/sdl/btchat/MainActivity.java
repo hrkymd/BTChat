@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
     private final static int SERVER_TIMEOUT_SEC = 90;
 
+    private String devName = "?";
     private int message_seq = 0;
 
     @Override
@@ -258,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 ChatMessage message = getItem(pos);
                 TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                text1.setTextColor(message.sender.equals(devName) ? Color.GRAY : Color.BLACK);
                 text1.setText(message.content);
                 return view;
             }
@@ -314,11 +317,14 @@ public class MainActivity extends AppCompatActivity {
     public void onClickSendButton(View v) {
         Log.d(TAG, "onClickSendButton");
         if (commThread != null) {
+            String content = inputText.getText().toString().trim();
+            if (content.length() == 0) {
+                Toast.makeText(this, R.string.toast_empty_message, Toast.LENGTH_SHORT).show();
+                return;
+            }
             message_seq++;
             long time = System.currentTimeMillis();
-            String content = inputText.getText().toString().trim();
-            String sender = btAdapter.getName();
-            ChatMessage message = new ChatMessage(message_seq, time, content, sender);
+            ChatMessage message = new ChatMessage(message_seq, time, content, devName);
             commThread.send(message);
             chatLogAdapter.add(message);
             chatLogAdapter.notifyDataSetChanged();
@@ -338,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupBT1() {
         Log.d(TAG, "setupBT1");
+        devName = btAdapter.getName();
         setState(State.Disconnected);
     }
 
@@ -348,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connect1(BluetoothDevice device) {
-        Log.d(TAG, "connect1: device=" + device.getName());
+        Log.d(TAG, "connect1");
         clientTask = new ClientTask();
         clientTask.execute(device);
         setState(State.Connecting, device.getName());
@@ -461,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
             BluetoothSocket socket = null;
             try {
                 serverSocket = btAdapter.listenUsingInsecureRfcommWithServiceRecord(
-                        btAdapter.getName(), SPP_UUID);
+                        devName, SPP_UUID);
                 socket = serverSocket.accept(params[0] * 1000);
             }
             catch (IOException e) {

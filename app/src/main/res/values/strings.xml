@@ -4,19 +4,20 @@
     <string name="status_text_disconnected">Disconnected</string>
     <string name="status_text_connecting_to">Connecting to %s</string>
     <string name="status_text_connected_to">Connected to %s</string>
-    <string name="status_text_waiting_for_connection">Waiting for connection</string>
+    <string name="status_text_waiting_for_connection">Listening for Incoming Connection</string>
 
     <string name="send_button_label">Send</string>
     <string name="input_text_hint">Message</string>
 
     <string name="menu_connect_title">Connect</string>
     <string name="menu_disconnect_title">Disconnect</string>
-    <string name="menu_server_start_title">Start Server</string>
-    <string name="menu_server_stop_title">Stop Server</string>
+    <string name="menu_server_start_title">Accept Connection</string>
+    <string name="menu_server_stop_title">Stop Listening</string>
+    <string name="menu_clear_title">Clear conversation</string>
     <string name="menu_about_title">About</string>
+
     <string name="menu_scan_start_title">Scan</string>
     <string name="menu_scan_stop_title">Stop</string>
-    <string name="menu_clear_title">Clear conversation</string>
 
     <string name="about_dialog_title">About BTChat</string>
     <string name="about_dialog_content">Simple Bluetooth chat application</string>
@@ -33,4 +34,5 @@
     <string name="toast_scanning_requires_permission">Scanning requires permission %s</string>
     <string name="toast_connection_failed">Connection failed</string>
     <string name="toast_connection_closed">Connection closed</string>
+    <string name="toast_empty_message">Empty message</string>
 </resources>
