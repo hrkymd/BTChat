@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
     private final static String SPP_UUID_STRING = "00001101-0000-1000-8000-00805F9B34FB";
     private final static UUID SPP_UUID = UUID.fromString(SPP_UUID_STRING);
 
+    private final static int SERVER_TIMEOUT_SEC = 90;
+
     private int message_seq = 0;
 
     @Override
@@ -88,7 +90,8 @@ public class MainActivity extends AppCompatActivity {
         if (btAdapter != null)
             setupBT();
         else {
-            Toast.makeText(this, R.string.toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_bluetooth_not_supported,
+                    Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -231,10 +234,7 @@ public class MainActivity extends AppCompatActivity {
                 setState(State.Disconnected);
             break;
         case REQCODE_DISCOVERABLE:
-            if (resCode != Activity.RESULT_CANCELED) {
-                Log.d(TAG, "resCode=" + resCode);
-                startServer1(resCode);
-            }
+            startServer1();
             break;
         }
     }
@@ -311,10 +311,11 @@ public class MainActivity extends AppCompatActivity {
     public void onClickSendButton(View v) {
         Log.d(TAG, "onClickSendButton");
         if (commThread != null) {
+            message_seq++;
+            long time = System.currentTimeMillis();
             String content = inputText.getText().toString().trim();
             String sender = btAdapter.getName();
-            ChatMessage message =
-                    new ChatMessage(++message_seq, System.currentTimeMillis(), content, sender);
+            ChatMessage message = new ChatMessage(message_seq, time, content, sender);
             commThread.send(message);
             chatLogAdapter.add(message);
             chatLogAdapter.notifyDataSetChanged();
@@ -362,14 +363,14 @@ public class MainActivity extends AppCompatActivity {
     private void startServer() {
         Log.d(TAG, "startServer");
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 90);
+        intent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, SERVER_TIMEOUT_SEC);
         startActivityForResult(intent, REQCODE_DISCOVERABLE);
     }
 
-    private void startServer1(int timeout) {
-        Log.d(TAG, "startServer1: timeout=" + timeout);
+    private void startServer1() {
+        Log.d(TAG, "startServer1");
         serverTask = new ServerTask();
-        serverTask.execute(timeout);
+        serverTask.execute(SERVER_TIMEOUT_SEC);
         setState(State.Waiting);
     }
 
@@ -396,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "doInBackground");
             BluetoothSocket socket = null;
             try {
-                socket = params[0].createRfcommSocketToServiceRecord(SPP_UUID);
+                socket = params[0].createInsecureRfcommSocketToServiceRecord(SPP_UUID);
                 socket.connect();
             }
             catch (IOException e) {
@@ -456,8 +457,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "doInBackground");
             BluetoothSocket socket = null;
             try {
-                serverSocket =
-                        btAdapter.listenUsingRfcommWithServiceRecord(btAdapter.getName(), SPP_UUID);
+                serverSocket = btAdapter.listenUsingInsecureRfcommWithServiceRecord(
+                        btAdapter.getName(), SPP_UUID);
                 socket = serverSocket.accept(params[0] * 1000);
             }
             catch (IOException e) {
@@ -571,13 +572,14 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             Log.d(TAG, "run");
-            commHandler.sendMessage(commHandler.obtainMessage(MESG_STARTED, socket.getRemoteDevice()));
+            commHandler.sendMessage(commHandler.obtainMessage(MESG_STARTED,
+                    socket.getRemoteDevice()));
             try {
                 writer.beginArray();
                 reader.beginArray();
-                while (reader.hasNext()) {
-                    commHandler.sendMessage(commHandler.obtainMessage(MESG_RECEIVED, reader.read()));
-                }
+                while (reader.hasNext())
+                    commHandler.sendMessage(
+                            commHandler.obtainMessage(MESG_RECEIVED, reader.read()));
             }
             catch (Exception e) {
                 Log.d(TAG, "reader exception");

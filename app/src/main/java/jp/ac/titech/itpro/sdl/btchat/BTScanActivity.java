@@ -298,6 +298,9 @@ public class BTScanActivity extends AppCompatActivity {
 
     private void setupBT1() {
         Log.d(TAG, "setupBT1");
+        for (BluetoothDevice device : btAdapter.getBondedDevices())
+            devListAdapter.add(device);
+        devListAdapter.notifyDataSetChanged();
         setState(State.Stopped);
     }
 
