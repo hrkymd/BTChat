@@ -4,7 +4,7 @@
     <string name="status_text_disconnected">Disconnected</string>
     <string name="status_text_connecting_to">Connecting to %s</string>
     <string name="status_text_connected_to">Connected to %s</string>
-    <string name="status_text_waiting_for_connection">Listening for Incoming Connection</string>
+    <string name="status_text_waiting_for_connection">Listening for incoming connection</string>
 
     <string name="send_button_label">Send</string>
     <string name="input_text_hint">Message</string>
@@ -13,7 +13,7 @@
     <string name="menu_disconnect_title">Disconnect</string>
     <string name="menu_server_start_title">Accept Connection</string>
     <string name="menu_server_stop_title">Stop Listening</string>
-    <string name="menu_clear_title">Clear conversation</string>
+    <string name="menu_clear_title">Clear Conversation</string>
     <string name="menu_about_title">About</string>
 
     <string name="menu_scan_start_title">Scan</string>
@@ -21,10 +21,10 @@
 
     <string name="about_dialog_title">About BTChat</string>
     <string name="about_dialog_content">Simple Bluetooth chat application</string>
-    <string name="alert_connection_confirmation">Do you really connect to this device?</string>
+    <string name="alert_connection_confirmation">Do you really want to connect to this device?</string>
 
-    <string name="bt_status_stopped">Select a device</string>
-    <string name="bt_status_scanning">Scanning progress</string>
+    <string name="bt_status_stopped">Select a device you want to connect to</string>
+    <string name="bt_status_scanning">Scanning in progress</string>
 
     <string name="message_title">#%1$d (%2$s)</string>
     <string name="message_content">%1$s\n\n%2$s</string>
