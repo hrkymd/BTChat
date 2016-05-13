@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "doInBackground");
             BluetoothSocket socket = null;
             try {
-                socket = params[0].createInsecureRfcommSocketToServiceRecord(SPP_UUID);
+                socket = params[0].createRfcommSocketToServiceRecord(SPP_UUID);
                 socket.connect();
             }
             catch (IOException e) {
@@ -456,7 +456,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "doInBackground");
             BluetoothSocket socket = null;
             try {
-                serverSocket = btAdapter.listenUsingInsecureRfcommWithServiceRecord(
+                serverSocket = btAdapter.listenUsingRfcommWithServiceRecord(
                         devName, SPP_UUID);
                 socket = serverSocket.accept(params[0] * 1000);
             }
