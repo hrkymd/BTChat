@@ -40,7 +40,6 @@ public class BTScanActivity extends AppCompatActivity {
 
     private ArrayList<BluetoothDevice> devList;
     private ArrayAdapter<BluetoothDevice> devListAdapter;
-    private final static String KEY_DEVLIST = "BTScanActivity.devList";
 
     private BluetoothAdapter btAdapter;
     private BroadcastReceiver btScanReceiver;
@@ -67,10 +66,7 @@ public class BTScanActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_btscan);
 
-        if (savedInstanceState != null)
-            devList = savedInstanceState.getParcelableArrayList(KEY_DEVLIST);
-        if (devList == null)
-            devList = new ArrayList<>();
+        devList = new ArrayList<>();
 
         setupUI();
 
@@ -104,7 +100,8 @@ public class BTScanActivity extends AppCompatActivity {
         if (btAdapter != null)
             setupBT();
         else {
-            Toast.makeText(this, R.string.toast_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_bluetooth_not_supported,
+                    Toast.LENGTH_SHORT).show();
             finish();
         }
     }
@@ -184,13 +181,6 @@ public class BTScanActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState");
-        outState.putParcelableArrayList(KEY_DEVLIST, devList);
-    }
-
-    @Override
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         Log.d(TAG, "onActivityResult");
         switch (reqCode) {
@@ -214,7 +204,8 @@ public class BTScanActivity extends AppCompatActivity {
             for (int i = 0; i < permissions.length; i++) {
                 if (grants[i] != PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, getString(R.string.toast_scanning_requires_permission,
-                            permissions[i]), Toast.LENGTH_SHORT).show();
+                            permissions[i]),
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
             }

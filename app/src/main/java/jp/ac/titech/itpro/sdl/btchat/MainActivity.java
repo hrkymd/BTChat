@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
 
     private ArrayList<ChatMessage> chatLog;
     private ArrayAdapter<ChatMessage> chatLogAdapter;
-    private final static String KEY_CHATLOG = "MainActivity.chatLog";
 
     private BluetoothAdapter btAdapter;
     private final static int REQCODE_ENABLE_BT = 1111;
@@ -80,10 +79,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState != null)
-            chatLog = savedInstanceState.getParcelableArrayList(KEY_CHATLOG);
-        if (chatLog == null)
-            chatLog = new ArrayList<>();
+        chatLog = new ArrayList<>();
 
         setupUI();
         setState(State.Initializing);
@@ -211,13 +207,6 @@ public class MainActivity extends AppCompatActivity {
         default:
             return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState");
-        outState.putParcelableArrayList(KEY_CHATLOG, chatLog);
     }
 
     @Override
