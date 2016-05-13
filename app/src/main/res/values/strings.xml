@@ -16,6 +16,7 @@
     <string name="menu_about_title">About</string>
     <string name="menu_scan_start_title">Scan</string>
     <string name="menu_scan_stop_title">Stop</string>
+    <string name="menu_clear_title">Clear conversation</string>
 
     <string name="about_dialog_title">About BTChat</string>
     <string name="about_dialog_content">Simple Bluetooth chat application</string>

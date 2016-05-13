@@ -18,8 +18,12 @@
         android:orderInCategory="104"
         android:title="@string/menu_server_stop_title"/>
     <item
-        android:id="@+id/menu_about"
+        android:id="@+id/menu_clear"
         android:orderInCategory="105"
+        android:title="@string/menu_clear_title"/>
+    <item
+        android:id="@+id/menu_about"
+        android:orderInCategory="106"
         android:title="@string/menu_about_title"/>
 
 </menu>

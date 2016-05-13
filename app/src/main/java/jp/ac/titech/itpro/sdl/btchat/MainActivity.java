@@ -196,6 +196,9 @@ public class MainActivity extends AppCompatActivity {
         case R.id.menu_server_stop:
             stopServer();
             return true;
+        case R.id.menu_clear:
+            chatLogAdapter.clear();
+            return true;
         case R.id.menu_about:
             new AlertDialog.Builder(this)
                     .setTitle(R.string.about_dialog_title)
