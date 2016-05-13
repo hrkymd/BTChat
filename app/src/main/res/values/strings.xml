@@ -31,4 +31,5 @@
     <string name="toast_bluetooth_disabled">Bluetooth should be enabled</string>
     <string name="toast_scanning_requires_permission">Scanning requires permission %s</string>
     <string name="toast_connection_failed">Connection failed</string>
+    <string name="toast_connection_closed">Connection closed</string>
 </resources>

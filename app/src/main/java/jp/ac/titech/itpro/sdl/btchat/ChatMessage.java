@@ -84,6 +84,10 @@ public class ChatMessage implements Parcelable {
             reader.close();
         }
 
+        public boolean hasNext() throws IOException {
+            return reader.hasNext();
+        }
+
         public void beginArray() throws IOException {
             Log.d(TAG, "beginArray");
             reader.beginArray();

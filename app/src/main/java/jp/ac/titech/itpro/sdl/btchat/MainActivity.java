@@ -127,6 +127,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+        if (state == State.Connected) {
+            commThread.close();
+        }
     }
 
     @Override
@@ -353,14 +356,6 @@ public class MainActivity extends AppCompatActivity {
             commThread.close();
             commThread = null;
         }
-        if (peerSocket != null && peerSocket.isConnected()) {
-            try {
-                peerSocket.close();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
         setState(State.Disconnected);
     }
 
@@ -384,7 +379,6 @@ public class MainActivity extends AppCompatActivity {
             serverTask.stop();
     }
 
-    private BluetoothSocket peerSocket;
     private ClientTask clientTask;
     private ServerTask serverTask;
 
@@ -426,21 +420,20 @@ public class MainActivity extends AppCompatActivity {
             if (socket == null) {
                 Toast.makeText(MainActivity.this, R.string.toast_connection_failed,
                         Toast.LENGTH_SHORT).show();
-                peerSocket = null;
                 setState(State.Disconnected);
             }
             else {
-                peerSocket = socket;
                 try {
-                    commThread = new CommThread(peerSocket);
+                    commThread = new CommThread(socket);
                     commThread.start();
                 }
                 catch (IOException e) {
                     try {
-                        peerSocket.close();
+                        socket.close();
                     }
-                    catch (IOException e1) { e1.printStackTrace(); }
-                    peerSocket = null;
+                    catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                     setState(State.Disconnected);
                 }
             }
@@ -488,21 +481,20 @@ public class MainActivity extends AppCompatActivity {
             if (socket == null) {
                 Toast.makeText(MainActivity.this, R.string.toast_connection_failed,
                         Toast.LENGTH_SHORT).show();
-                peerSocket = null;
                 setState(State.Disconnected);
             }
             else {
-                peerSocket = socket;
                 try {
-                    commThread = new CommThread(peerSocket);
+                    commThread = new CommThread(socket);
                     commThread.start();
                 }
                 catch (IOException e) {
                     try {
-                        peerSocket.close();
+                        socket.close();
                     }
-                    catch (IOException e1) { e1.printStackTrace(); }
-                    peerSocket = null;
+                    catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                     setState(State.Disconnected);
                 }
             }
@@ -541,14 +533,16 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "handleMessage");
             switch (msg.what) {
             case MESG_STARTED:
-                BluetoothDevice device = (BluetoothDevice)msg.obj;
+                BluetoothDevice device = (BluetoothDevice) msg.obj;
                 setState(State.Connected, device.getName());
                 break;
             case MESG_FINISHED:
+                Toast.makeText(MainActivity.this, R.string.toast_connection_closed,
+                        Toast.LENGTH_SHORT).show();
                 setState(State.Disconnected);
                 break;
             case MESG_RECEIVED:
-                chatLogAdapter.add((ChatMessage)msg.obj);
+                chatLogAdapter.add((ChatMessage) msg.obj);
                 chatLogAdapter.notifyDataSetChanged();
                 chatLogList.smoothScrollToPosition(chatLogAdapter.getCount());
                 break;
@@ -561,13 +555,17 @@ public class MainActivity extends AppCompatActivity {
     private class CommThread extends Thread {
         private final static String TAG = "CommThread";
         private final BluetoothSocket socket;
-        private ChatMessage.Reader reader;
-        private ChatMessage.Writer writer;
+        private final ChatMessage.Reader reader;
+        private final ChatMessage.Writer writer;
 
         public CommThread(BluetoothSocket socket) throws IOException {
+            if (!socket.isConnected())
+                throw new IOException("Socket is not connected");
             this.socket = socket;
-            reader = new ChatMessage.Reader(new JsonReader(new InputStreamReader(socket.getInputStream(), "UTF-8")));
-            writer = new ChatMessage.Writer(new JsonWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8")));
+            reader = new ChatMessage.Reader(new JsonReader(
+                    new InputStreamReader(socket.getInputStream(), "UTF-8")));
+            writer = new ChatMessage.Writer(new JsonWriter(
+                    new OutputStreamWriter(socket.getOutputStream(), "UTF-8")));
         }
 
         @Override
@@ -577,24 +575,22 @@ public class MainActivity extends AppCompatActivity {
             try {
                 writer.beginArray();
                 reader.beginArray();
-                while (socket.isConnected()) {
-                    Log.d(TAG, "waiting for read");
-                    ChatMessage message = reader.read();
-                    commHandler.sendMessage(commHandler.obtainMessage(MESG_RECEIVED, message));
+                while (reader.hasNext()) {
+                    commHandler.sendMessage(commHandler.obtainMessage(MESG_RECEIVED, reader.read()));
                 }
             }
-            catch (IOException e) {
-                Log.d(TAG, "Reader gets exception");
+            catch (Exception e) {
+                Log.d(TAG, "reader exception");
             }
             finally {
-                try {
-                    writer.endArray();
-                    reader.endArray();
-                    reader.close();
-                    writer.close();
-                    socket.close();
+                if (socket.isConnected()) {
+                    try {
+                        socket.close();
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                catch (IOException e) { e.printStackTrace(); }
             }
             commHandler.sendMessage(commHandler.obtainMessage(MESG_FINISHED));
         }
@@ -605,7 +601,7 @@ public class MainActivity extends AppCompatActivity {
                 writer.flush();
             }
             catch (IOException e) {
-                Log.d(TAG, "writer gets exceptions");
+                e.printStackTrace();
             }
         }
 
@@ -613,7 +609,9 @@ public class MainActivity extends AppCompatActivity {
             try {
                 socket.close();
             }
-            catch (IOException e) { e.printStackTrace(); }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
